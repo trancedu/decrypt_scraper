@@ -8,7 +8,7 @@ df.index = pd.to_datetime(df.index, unit='ms')
 data = df.resample('15T').last()
 
 
-import zigzag
+# import zigzag
 
 PEAK = 1
 VALLEY = -1
@@ -268,7 +268,7 @@ def main():
     # args = [(a, c, b, d) for a in safe_arange(0.01, 0.1, 0.005) for c in safe_arange(-0.1, -0.005, 0.005) for b in [5, 15, 30] for d in [0,50,100,200]]
     
     start = time.perf_counter()
-    with ProcessPoolExecutor(multiprocessing.cpu_count() - 1) as executor:
+    with ProcessPoolExecutor(multiprocessing.cpu_count()) as executor:
     # with ProcessPoolExecutor(10) as executor:
         stats_list = executor.map(run_backtest, args)
     end = time.perf_counter()
