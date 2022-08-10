@@ -343,7 +343,7 @@ def main():
     ## 保存结果
     i = 1
     while True:
-        file_name = f"BackTestLearn/zigzag_rank{start_date}_updown_profit_both v{i}.csv"
+        file_name = f"BackTestLearn/data/zigzag_rank{start_date}_updown_profit_both v{i}.csv"
         if os.path.exists(file_name):
             i += 1 
         else:

@@ -268,7 +268,7 @@ def main():
     # args = [(a, c, b, d) for a in safe_arange(0.01, 0.12, 0.01) for c in safe_arange(-0.11, 0, 0.01) for b in [720, 1440, 2160,7200] for d in [0]+safe_arange(0.6, 1, 0.05).tolist()]
     # args = [(a, c, b, d) for a in safe_arange(0.01, 0.12, 0.01) for c in safe_arange(-0.11, -0.005, 0.01) for b in [720, 1440, 2160,7200] for d in [10]+safe_arange(1, 1.6, 0.1).tolist()]
     # args = [(a, c, b, d) for a in safe_arange(0.005, 0.3, 0.005) for c in safe_arange(-0.3, -0.005, 0.005) for b in [2, 5, 15, 20, 30, 60, 120, 240, 720] + [1440 * i for i in range(1, 8)] + [1440*15, 1440*30] for d in [1]]
-    args = [(a, c, b, d) for a in safe_arange(0.01, 0.1, 0.005) for c in safe_arange(-0.1, -0.005, 0.005) for b in [15, 30] for d in [0,50,100,200]]
+    args = [(a, c, b, d) for a in safe_arange(0.01, 0.1, 0.005) for c in safe_arange(-0.1, -0.005, 0.005) for b in [30] for d in [50,200]]
     
     start = time.perf_counter()
     with ProcessPoolExecutor(multiprocessing.cpu_count()) as executor:
@@ -284,7 +284,7 @@ def main():
     ## 保存结果
     i = 1
     while True:
-        file_name = f"BackTestLearn/zigzag_rank{start_date}_updown_profit_both v{i}.csv"
+        file_name = f"BackTestLearn/data/zigzag_rank{start_date}_updown_profit_both v{i}.csv"
         if os.path.exists(file_name):
             i += 1 
         else:
