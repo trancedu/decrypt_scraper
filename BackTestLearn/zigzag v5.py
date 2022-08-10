@@ -220,22 +220,25 @@ def backtest_both(X, rise, down, take_profit_long=10, take_profit_short=0, outpu
     # 计算收益率等参数
     df_pnl["ret"] = df_pnl["cum_return"].diff().fillna(0)
     freq = (df_pnl.index[1] - df_pnl.index[0]).total_seconds() // 60
+    annual_freq = freq / 60 / 24 / 365
     rets = df_pnl.loc[df_pnl["ret"] != 0, "ret"] # 只计算入场的时刻的收益率
     if len(rets) == 0:
         stats = {}
     else:
-        time_length = rets.shape[0] * ((df_pnl.index[1] - df_pnl.index[0]).total_seconds() / 3600 / 24 / 365)
+        time_length = rets.shape[0] * annual_freq
         total_return = df_pnl["cum_return"][-1]
         yearly_return = total_return / time_length
-        yearly_vol = df_pnl["ret"].std() * np.sqrt(60 / freq * 24 * 365)
+        yearly_vol = df_pnl["ret"].std() / np.sqrt(annual_freq)
         maxdrawdown = max(rets.cumsum().cummax() - rets.cumsum())
         sharpe = yearly_return / yearly_vol
-        stats = dict(rise=rise, down=down, freq=freq, take_profit_long=take_profit_long, take_profit_short=take_profit_short, total_return=total_return, yearly_vol=yearly_vol, maxdrawdown=maxdrawdown, sharpe=sharpe, hold_time=time_length, ma_window=ma_window, start_date=X.index[0].date(), end_date=X.index[-1].date())
+        cummaxs = np.where(df_pnl["cum_return"] == df_pnl["cum_return"].cummax())[0]
+        max_loss_period = max(np.diff(cummaxs).max(), len(df_pnl) - cummaxs[-1]) * annual_freq
+        stats = dict(rise=rise, down=down, freq=freq, ma_window=ma_window, total_return=total_return, yearly_vol=yearly_vol, maxdrawdown=maxdrawdown, sharpe=sharpe, max_loss_period=max_loss_period, hold_time=time_length,  start_date=X.index[0].date(), end_date=X.index[-1].date())
     # stats = [rise, total_return, yearly_vol, maxdrawdown]
     return df_pnl, stats
 
-start_date = "2020"
-end_date = "2022"
+start_date = "2021"
+end_date = "2021"
 
 
 stats_list = []  
@@ -265,7 +268,7 @@ def main():
     # args = [(a, c, b, d) for a in safe_arange(0.01, 0.12, 0.01) for c in safe_arange(-0.11, 0, 0.01) for b in [720, 1440, 2160,7200] for d in [0]+safe_arange(0.6, 1, 0.05).tolist()]
     # args = [(a, c, b, d) for a in safe_arange(0.01, 0.12, 0.01) for c in safe_arange(-0.11, -0.005, 0.01) for b in [720, 1440, 2160,7200] for d in [10]+safe_arange(1, 1.6, 0.1).tolist()]
     # args = [(a, c, b, d) for a in safe_arange(0.005, 0.3, 0.005) for c in safe_arange(-0.3, -0.005, 0.005) for b in [2, 5, 15, 20, 30, 60, 120, 240, 720] + [1440 * i for i in range(1, 8)] + [1440*15, 1440*30] for d in [1]]
-    args = [(a, c, b, d) for a in safe_arange(0.01, 0.1, 0.01) for c in safe_arange(-0.1, -0.005, 0.001) for b in [15, 30] for d in [0,50,100,200]]
+    args = [(a, c, b, d) for a in safe_arange(0.01, 0.1, 0.005) for c in safe_arange(-0.1, -0.005, 0.005) for b in [15, 30] for d in [0,50,100,200]]
     
     start = time.perf_counter()
     with ProcessPoolExecutor(multiprocessing.cpu_count()) as executor:
